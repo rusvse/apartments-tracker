@@ -52,4 +52,183 @@ function fillSelect(id, valuesSet) {
 }
 
 function getFiltered() {
-  const search = document.getElementById('sea
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const fObj = document.getElementById('filterObjekt').value;
+  const fStage = document.getElementById('filterStage').value;
+  const fStatus = document.getElementById('filterStatus').value;
+  const fOtv = document.getElementById('filterOtvetstv').value;
+  const sort = document.getElementById('sortSelect').value;
+
+  let list = apartments.filter(a => {
+    if (search && !(String(a.ID||'').toLowerCase().includes(search) || String(a.Номер_квартиры||'').toLowerCase().includes(search))) return false;
+    if (fObj && a.Объект !== fObj) return false;
+    if (fStage && a.Стадия !== fStage) return false;
+    if (fStatus && a.Статус !== fStatus) return false;
+    if (fOtv && a.Ответственный !== fOtv) return false;
+    return true;
+  });
+
+  if (sort === 'percent_asc') list.sort((a,b) => (parseFloat(a.Процент)||0) - (parseFloat(b.Процент)||0));
+  if (sort === 'percent_desc') list.sort((a,b) => (parseFloat(b.Процент)||0) - (parseFloat(a.Процент)||0));
+  if (sort === 'date_asc') list.sort((a,b) => parseDate(a.Дата_обновления) - parseDate(b.Дата_обновления));
+  if (sort === 'date_desc') list.sort((a,b) => parseDate(b.Дата_обновления) - parseDate(a.Дата_обновления));
+  if (sort === 'id_asc') list.sort((a,b) => String(a.ID).localeCompare(String(b.ID)));
+
+  return list;
+}
+
+function parseDate(str) {
+  if (!str) return 0;
+  const parts = str.split('.');
+  if (parts.length === 3) return new Date(parts[2], parts[1]-1, parts[0]).getTime();
+  return new Date(str).getTime() || 0;
+}
+
+function statusClassName(status) {
+  if (!status) return '';
+  const normalized = status.trim().toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/[^a-zа-я0-9]/g, '');
+  const map = {
+    'завершено': 'status-zaversheno',
+    'вработе': 'status-vrabote',
+    'заморожено': 'status-zamorozheno',
+    'неначато': 'status-nenachato'
+  };
+  return map[normalized] || '';
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+function renderTable() {
+  const list = getFiltered();
+  const tbody = document.getElementById('tableBody');
+  if (list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10" class="loading">Нет данных по заданным фильтрам</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(a => {
+    const pct = parseFloat(a.Процент) || 0;
+    const statusClass = statusClassName(a.Статус);
+    const remainingFull = escapeHtml(a.Что_осталось || '');
+    return `<tr data-id="${a.ID}">
+      <td>${a.ID || ''}</td>
+      <td>${a.Объект || ''}</td>
+      <td>${a.Номер_квартиры || ''}</td>
+      <td>${a.Этаж || ''}</td>
+      <td>${a.Стадия || ''}</td>
+      <td>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" style="width:${pct}%">${pct}%</div>
+        </div>
+      </td>
+      <td title="${remainingFull}">${a.Что_осталось || ''}</td>
+      <td>${a.Ответственный || ''}</td>
+      <td><span class="status-tag ${statusClass}">${a.Статус || ''}</span></td>
+      <td>${a.Дата_обновления || ''}</td>
+    </tr>`;
+  }).join('');
+
+  document.querySelectorAll('#tableBody tr').forEach(row => {
+    row.addEventListener('click', () => openModal(row.dataset.id));
+  });
+}
+
+function updateStats() {
+  const total = apartments.length;
+  const done = apartments.filter(a => a.Статус === 'Завершено').length;
+  const inProgress = apartments.filter(a => a.Статус === 'В работе').length;
+  const avgPct = total ? (apartments.reduce((s,a) => s + (parseFloat(a.Процент)||0), 0) / total).toFixed(1) : 0;
+  document.getElementById('stats').textContent =
+    `Всего квартир: ${total} | Завершено: ${done} | В работе: ${inProgress} | Средний прогресс: ${avgPct}%`;
+}
+
+function openModal(id) {
+  currentApartmentId = id;
+  const apt = apartments.find(a => a.ID === id);
+  if (!apt) return;
+
+  document.getElementById('modalTitle').textContent = `${apt.Объект} — кв. ${apt.Номер_квартиры} (${apt.ID})`;
+
+  const fields = [
+    ['Объект', apt.Объект], ['Номер квартиры', apt.Номер_квартиры], ['Этаж', apt.Этаж],
+    ['Подъезд', apt.Подъезд], ['Площадь, м²', apt.Площадь_м2], ['Стадия', apt.Стадия],
+    ['Процент выполнения', (apt.Процент||0) + '%'], ['Что осталось', apt.Что_осталось],
+    ['Ответственный', apt.Ответственный], ['Статус', apt.Статус],
+    ['Дата обновления', apt.Дата_обновления], ['Примечание', apt.Примечание]
+  ];
+  document.getElementById('detailsContent').innerHTML = fields.map(([k,v]) =>
+    `<tr><td>${k}</td><td>${v || '—'}</td></tr>`).join('');
+
+  loadComments(id);
+  document.getElementById('modalOverlay').classList.remove('hidden');
+  switchTab('details');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.add('hidden');
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('tabDetails').classList.toggle('active', tab === 'details');
+  document.getElementById('tabComments').classList.toggle('active', tab === 'comments');
+}
+
+function loadComments(id) {
+  const list = document.getElementById('commentsList');
+  list.innerHTML = 'Загрузка комментариев...';
+  fetch(`${APPS_SCRIPT_URL}?idKvartiry=${encodeURIComponent(id)}`)
+    .then(res => res.json())
+    .then(comments => {
+      if (!comments.length) {
+        list.innerHTML = '<p style="color:#888;">Комментариев пока нет.</p>';
+        return;
+      }
+      list.innerHTML = comments.map(c => `
+        <div class="comment-item">
+          <div class="comment-meta">${c.author} — ${new Date(c.date).toLocaleString('ru-RU')}</div>
+          <div>${c.comment}</div>
+        </div>`).join('');
+    })
+    .catch(() => { list.innerHTML = '<p style="color:red;">Ошибка загрузки комментариев.</p>'; });
+}
+
+function submitComment(e) {
+  e.preventDefault();
+  const author = document.getElementById('commentAuthor').value.trim();
+  const comment = document.getElementById('commentText').value.trim();
+  const statusDiv = document.getElementById('commentStatus');
+  if (!author || !comment) return;
+
+  statusDiv.textContent = 'Отправка...';
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({ idKvartiry: currentApartmentId, author, comment })
+  })
+    .then(res => res.json())
+    .then(() => {
+      statusDiv.textContent = 'Комментарий добавлен!';
+      document.getElementById('commentText').value = '';
+      loadComments(currentApartmentId);
+    })
+    .catch(() => { statusDiv.textContent = 'Ошибка отправки. Попробуйте снова.'; });
+}
+
+document.getElementById('searchInput').addEventListener('input', renderTable);
+document.getElementById('filterObjekt').addEventListener('change', renderTable);
+document.getElementById('filterStage').addEventListener('change', renderTable);
+document.getElementById('filterStatus').addEventListener('change', renderTable);
+document.getElementById('filterOtvetstv').addEventListener('change', renderTable);
+document.getElementById('sortSelect').addEventListener('change', renderTable);
+document.getElementById('refreshBtn').addEventListener('click', loadData);
+document.getElementById('closeModal').addEventListener('click', closeModal);
+document.getElementById('modalOverlay').addEventListener('click', (e) => { if (e.target.id === 'modalOverlay') closeModal(); });
+document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+document.getElementById('commentForm').addEventListener('submit', submitComment);
+
+loadData();
