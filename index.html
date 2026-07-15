@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Трекер квартир</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+<header>
+  <h1>Трекер квартир — статус строительства</h1>
+  <div id="stats" class="stats"></div>
+</header>
+
+<section class="controls">
+  <input type="text" id="searchInput" placeholder="Поиск по ID или номеру квартиры...">
+
+  <select id="filterObjekt"><option value="">Все объекты</option></select>
+  <select id="filterStage"><option value="">Все стадии</option></select>
+  <select id="filterStatus"><option value="">Все статусы</option></select>
+  <select id="filterOtvetstv"><option value="">Все ответственные</option></select>
+
+  <select id="sortSelect">
+    <option value="">Без сортировки</option>
+    <option value="percent_asc">% выполнения ↑</option>
+    <option value="percent_desc">% выполнения ↓</option>
+    <option value="date_asc">Дата обновления ↑</option>
+    <option value="date_desc">Дата обновления ↓</option>
+    <option value="id_asc">ID ↑</option>
+  </select>
+
+  <button id="refreshBtn">🔄 Обновить данные</button>
+</section>
+
+<main>
+  <table id="apartmentsTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Объект</th>
+        <th>№ кв.</th>
+        <th>Этаж</th>
+        <th>Стадия</th>
+        <th>Прогресс</th>
+        <th>Что осталось</th>
+        <th>Ответственный</th>
+        <th>Статус</th>
+        <th>Обновлено</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <tr><td colspan="10" class="loading">Загрузка данных...</td></tr>
+    </tbody>
+  </table>
+</main>
+
+<div id="modalOverlay" class="modal-overlay hidden">
+  <div class="modal">
+    <button id="closeModal" class="close-btn">✕</button>
+    <h2 id="modalTitle"></h2>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="details">Детали</button>
+      <button class="tab-btn" data-tab="comments">Комментарии</button>
+    </div>
+
+    <div id="tabDetails" class="tab-content active">
+      <table class="detailsTable" id="detailsContent"></table>
+    </div>
+
+    <div id="tabComments" class="tab-content">
+      <div id="commentsList" class="comments-list"></div>
+      <form id="commentForm">
+        <input type="text" id="commentAuthor" placeholder="Ваше имя" required>
+        <textarea id="commentText" placeholder="Введите комментарий..." required></textarea>
+        <button type="submit">Отправить</button>
+      </form>
+      <div id="commentStatus"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>Данные обновляются из Google Таблицы. Последнее обновление страницы: <span id="lastLoad"></span></p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
