@@ -134,13 +134,19 @@ td:nth-child(7) {
 .modal {
   background: #fff;
   border-radius: 6px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 90vh;
-  padding: 20px;
+  width: 92%;
+  max-width: 640px;
+  max-height: 88vh;
+  padding: 16px 20px;
   position: relative;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+.modal h2 {
+  font-size: 16px;
+  margin: 4px 0 8px 0;
+  padding-right: 24px;
 }
 .close-btn {
   position: absolute;
@@ -160,12 +166,34 @@ td:nth-child(7) {
   border-bottom: 2px solid transparent;
 }
 .tab-btn.active { border-bottom: 2px solid #2980b9; font-weight: bold; color: #2980b9; }
-.tab-content { display: none; overflow-y: auto; }
+.tab-content { display: none; overflow-y: auto; min-height: 0; flex: 1; }
 .tab-content.active { display: block; }
 
-.detailsTable { table-layout: auto; }
-.detailsTable td { white-space: normal; overflow: visible; text-overflow: unset; }
-.detailsTable td:first-child { font-weight: bold; width: 40%; background: #f9f9f9; }
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+  font-size: 12.5px;
+}
+.details-grid .full-width {
+  grid-column: 1 / -1;
+}
+.detail-field {
+  background: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 6px 8px;
+}
+.detail-field .label {
+  font-weight: bold;
+  color: #555;
+  font-size: 11px;
+  display: block;
+  margin-bottom: 2px;
+}
+.detail-field .value {
+  word-break: break-word;
+}
 
 .comments-list { max-height: 35vh; overflow-y: auto; margin-bottom: 12px; }
 .comment-item {
