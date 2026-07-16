@@ -239,9 +239,9 @@ footer {
   .controls input, .controls select, .controls button {
     width: 100%;
   }
-  main { padding: 10px; }
+  main { padding: 10px; overflow-x: hidden; }
 
-  table { table-layout: auto; }
+  table { table-layout: auto; width: 100%; max-width: 100%; }
 
   thead { display: none; }
 
@@ -255,36 +255,30 @@ footer {
   }
 
   tbody td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: block;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
     border: none;
     border-bottom: 1px solid #f0f0f0;
     padding: 6px 4px;
     white-space: normal;
     overflow: visible;
     text-overflow: unset;
+    word-break: break-word;
   }
   tbody td:last-child { border-bottom: none; }
 
   tbody td::before {
     content: attr(data-label);
+    display: block;
     font-weight: bold;
     color: #555;
     font-size: 11px;
-    margin-right: 10px;
-    flex-shrink: 0;
+    margin-bottom: 3px;
   }
 
-  tbody td[data-label="Что осталось"] {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  tbody td[data-label="Что осталось"]::before {
-    margin-bottom: 4px;
-  }
-
-  .progress-bar-bg { max-width: 100%; flex: 1; margin-left: 8px; }
+  .progress-bar-bg { max-width: 100%; width: 100%; margin-left: 0; }
 
   .modal {
     width: 95%;
