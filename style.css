@@ -117,7 +117,7 @@ td:nth-child(7) {
   white-space: nowrap;
 }
 .status-zaversheno { background: #27ae60; }
-.status-vrabote { background: #e67e22; }
+.status-vrabote { background: #27ae60; }
 .status-zamorozheno { background: #7f8c8d; }
 .status-nenachato { background: #c0392b; }
 
