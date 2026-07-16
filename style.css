@@ -306,3 +306,50 @@ footer {
   tbody td::before { font-size: 10px; }
   .status-tag { font-size: 10px; padding: 2px 6px; }
 }
+
+
+/* Исправление ширины полей в карточках на телефонах и планшетах */
+@media (max-width: 900px) {
+  #apartmentsTable tbody td,
+  #apartmentsTable tbody td:nth-child(n) {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  #apartmentsTable tbody td {
+    display: grid;
+    grid-template-columns: 118px minmax(0, 1fr);
+    column-gap: 10px;
+    justify-content: initial;
+  }
+
+  #apartmentsTable tbody td::before {
+    margin-right: 0;
+  }
+
+  #apartmentsTable tbody td[data-label="Что осталось"] {
+    display: block;
+  }
+
+  #apartmentsTable tbody td[data-label="Что осталось"]::before {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  #apartmentsTable tbody td[data-label="Прогресс"] .progress-bar-bg {
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+  }
+
+  #apartmentsTable tbody td[data-label="Прогресс"] {
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  #apartmentsTable tbody td {
+    grid-template-columns: 88px minmax(0, 1fr);
+    column-gap: 8px;
+  }
+}
