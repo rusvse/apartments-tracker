@@ -251,7 +251,8 @@ footer {
     grid-template-areas:
       "id status"
       "object object"
-      "flat stage"
+      "flat floor"
+      "stage stage"
       "progress progress";
     gap: 4px 8px;
     margin-bottom: 8px;
@@ -290,6 +291,7 @@ footer {
   tbody td[data-label="ID"] { grid-area: id; }
   tbody td[data-label="Объект"] { grid-area: object; }
   tbody td[data-label="№ кв."] { grid-area: flat; }
+  tbody td[data-label="Этаж"] { grid-area: floor; }
   tbody td[data-label="Стадия"] { grid-area: stage; }
   tbody td[data-label="Прогресс"] { grid-area: progress; }
 
