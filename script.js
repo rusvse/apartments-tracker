@@ -155,14 +155,15 @@ function openModal(id) {
   document.getElementById('modalTitle').textContent = `${apt.Объект} — кв. ${apt.Номер_квартиры} (${apt.ID})`;
 
   const fields = [
-    ['Объект', apt.Объект], ['Номер квартиры', apt.Номер_квартиры], ['Этаж', apt.Этаж],
-    ['Подъезд', apt.Подъезд], ['Площадь, м²', apt.Площадь_м2], ['Стадия', apt.Стадия],
-    ['Процент выполнения', (apt.Процент||0) + '%'], ['Что осталось', apt.Что_осталось],
-    ['Ответственный', apt.Ответственный], ['Статус', apt.Статус],
-    ['Дата обновления', apt.Дата_обновления], ['Примечание', apt.Примечание]
+    ['Объект', apt.Объект, false], ['Номер квартиры', apt.Номер_квартиры, false],
+    ['Этаж', apt.Этаж, false], ['Подъезд', apt.Подъезд, false],
+    ['Площадь, м²', apt.Площадь_м2, false], ['Стадия', apt.Стадия, false],
+    ['Процент выполнения', (apt.Процент||0) + '%', false], ['Ответственный', apt.Ответственный, false],
+    ['Статус', apt.Статус, false], ['Дата обновления', apt.Дата_обновления, false],
+    ['Что осталось', apt.Что_осталось, true], ['Примечание', apt.Примечание, true]
   ];
-  document.getElementById('detailsContent').innerHTML = fields.map(([k,v]) =>
-    `<tr><td>${k}</td><td>${v || '—'}</td></tr>`).join('');
+  document.getElementById('detailsContent').innerHTML = fields.map(([k,v,full]) =>
+    `<div class="detail-field${full ? ' full-width' : ''}"><span class="label">${k}</span><span class="value">${v || '—'}</span></div>`).join('');
 
   loadComments(id);
   document.getElementById('modalOverlay').classList.remove('hidden');
