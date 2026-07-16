@@ -219,16 +219,28 @@ function submitComment(e) {
     .catch(() => { statusDiv.textContent = 'Ошибка отправки. Попробуйте снова.'; });
 }
 
-document.getElementById('searchInput').addEventListener('input', renderTable);
-document.getElementById('filterObjekt').addEventListener('change', renderTable);
-document.getElementById('filterStage').addEventListener('change', renderTable);
-document.getElementById('filterStatus').addEventListener('change', renderTable);
-document.getElementById('filterOtvetstv').addEventListener('change', renderTable);
-document.getElementById('sortSelect').addEventListener('change', renderTable);
-document.getElementById('refreshBtn').addEventListener('click', loadData);
-document.getElementById('closeModal').addEventListener('click', closeModal);
-document.getElementById('modalOverlay').addEventListener('click', (e) => { if (e.target.id === 'modalOverlay') closeModal(); });
-document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
-document.getElementById('commentForm').addEventListener('submit', submitComment);
+function initEventListeners() {
+  document.getElementById('searchInput').addEventListener('input', renderTable);
+  document.getElementById('filterObjekt').addEventListener('change', renderTable);
+  document.getElementById('filterStage').addEventListener('change', renderTable);
+  document.getElementById('filterStatus').addEventListener('change', renderTable);
+  document.getElementById('filterOtvetstv').addEventListener('change', renderTable);
+  document.getElementById('sortSelect').addEventListener('change', renderTable);
+  document.getElementById('refreshBtn').addEventListener('click', loadData);
+  document.getElementById('closeModal').addEventListener('click', closeModal);
+  document.getElementById('modalOverlay').addEventListener('click', (e) => {
+    if (e.target.id === 'modalOverlay') closeModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !document.getElementById('modalOverlay').classList.contains('hidden')) {
+      closeModal();
+    }
+  });
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+  document.getElementById('commentForm').addEventListener('submit', submitComment);
+}
 
+initEventListeners();
 loadData();
