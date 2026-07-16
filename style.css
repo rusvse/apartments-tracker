@@ -226,3 +226,83 @@ footer {
   color: #888;
   text-align: center;
 }
+
+
+/* ===== Мобильная адаптация ===== */
+@media (max-width: 900px) {
+  header h1 { font-size: 17px; }
+  .stats { font-size: 12px; }
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .controls input, .controls select, .controls button {
+    width: 100%;
+  }
+  main { padding: 10px; }
+
+  table { table-layout: auto; }
+
+  thead { display: none; }
+
+  tbody tr {
+    display: block;
+    margin-bottom: 12px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px;
+  }
+
+  tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 6px 4px;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+  }
+  tbody td:last-child { border-bottom: none; }
+
+  tbody td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    color: #555;
+    font-size: 11px;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+
+  tbody td[data-label="Что осталось"] {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  tbody td[data-label="Что осталось"]::before {
+    margin-bottom: 4px;
+  }
+
+  .progress-bar-bg { max-width: 100%; flex: 1; margin-left: 8px; }
+
+  .modal {
+    width: 95%;
+    max-height: 92vh;
+    padding: 14px;
+  }
+  .modal h2 { font-size: 14px; }
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+  .tab-btn { padding: 8px 10px; font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+  header { padding: 12px 14px; }
+  header h1 { font-size: 15px; }
+  .controls { padding: 10px; }
+  main { padding: 8px; }
+  tbody td::before { font-size: 10px; }
+  .status-tag { font-size: 10px; padding: 2px 6px; }
+}
