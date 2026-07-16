@@ -116,20 +116,20 @@ function renderTable() {
     const statusClass = statusClassName(a.Статус);
     const remainingFull = escapeHtml(a.Что_осталось || '');
     return `<tr data-id="${a.ID}">
-      <td>${a.ID || ''}</td>
-      <td>${a.Объект || ''}</td>
-      <td>${a.Номер_квартиры || ''}</td>
-      <td>${a.Этаж || ''}</td>
-      <td>${a.Стадия || ''}</td>
-      <td>
+      <td data-label="ID">${a.ID || ''}</td>
+      <td data-label="Объект">${a.Объект || ''}</td>
+      <td data-label="№ кв.">${a.Номер_квартиры || ''}</td>
+      <td data-label="Этаж">${a.Этаж || ''}</td>
+      <td data-label="Стадия">${a.Стадия || ''}</td>
+      <td data-label="Прогресс">
         <div class="progress-bar-bg">
           <div class="progress-bar-fill" style="width:${pct}%">${pct}%</div>
         </div>
       </td>
-      <td title="${remainingFull}">${a.Что_осталось || ''}</td>
-      <td>${a.Ответственный || ''}</td>
-      <td><span class="status-tag ${statusClass}">${a.Статус || ''}</span></td>
-      <td>${a.Дата_обновления || ''}</td>
+      <td data-label="Что осталось" title="${remainingFull}">${a.Что_осталось || ''}</td>
+      <td data-label="Ответственный">${a.Ответственный || ''}</td>
+      <td data-label="Статус"><span class="status-tag ${statusClass}">${a.Статус || ''}</span></td>
+      <td data-label="Обновлено">${a.Дата_обновления || ''}</td>
     </tr>`;
   }).join('');
 
