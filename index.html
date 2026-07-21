@@ -1,90 +1,50 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Трекер квартир</title>
-<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Трекер квартир</title><link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
-<header>
-  <h1>Трекер квартир — статус строительства</h1>
-  <div id="stats" class="stats"></div>
-</header>
+<div class="app-shell">
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><span class="brand-mark">✓</span><span>Трекер квартир</span></div>
+  <nav class="nav">
+    <button class="nav-link active" data-page="overview"><span>▦</span> Обзор</button>
+    <button class="nav-link" data-page="apartments"><span>⌂</span> Квартиры</button>
+    <button class="nav-link" data-page="works"><span>☷</span> Работы</button>
+    <button class="nav-link" data-page="history"><span>◷</span> Уведомления / История</button>
+    <button class="nav-link" data-page="settings"><span>⚙</span> Настройки</button>
+  </nav>
+  <div class="sidebar-bottom"><div class="user-dot">А</div><div><b>Администратор</b><small>Управление объектами</small></div></div>
+</aside>
+<main class="content">
+  <header class="topbar"><button id="menuBtn" class="menu-btn">☰</button><div><h1 id="pageTitle">Обзор</h1><p id="pageSubtitle">Контроль ремонтов и текущего состояния объектов</p></div><button id="refreshBtn" class="refresh-btn">↻ Обновить данные</button></header>
 
-<section class="controls">
-  <input type="text" id="searchInput" placeholder="Поиск по ID или номеру квартиры...">
-
-  <select id="filterObjekt"><option value="">Все объекты</option></select>
-  <select id="filterStage"><option value="">Все стадии</option></select>
-  <select id="filterStatus"><option value="">Все статусы</option></select>
-  <select id="filterOtvetstv"><option value="">Все ответственные</option></select>
-
-  <select id="sortSelect">
-    <option value="">Без сортировки</option>
-    <option value="percent_asc">% выполнения ↑</option>
-    <option value="percent_desc">% выполнения ↓</option>
-    <option value="date_asc">Дата обновления ↑</option>
-    <option value="date_desc">Дата обновления ↓</option>
-    <option value="id_asc">ID ↑</option>
-  </select>
-
-  <button id="refreshBtn">🔄 Обновить данные</button>
-</section>
-
-<main>
-  <table id="apartmentsTable">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Объект</th>
-        <th>№ кв.</th>
-        <th>Этаж</th>
-        <th>Стадия</th>
-        <th>Прогресс</th>
-        <th>Что осталось</th>
-        <th>Ответственный</th>
-        <th>Статус</th>
-        <th>Обновлено</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody">
-      <tr><td colspan="10" class="loading">Загрузка данных...</td></tr>
-    </tbody>
-  </table>
-</main>
-
-<div id="modalOverlay" class="modal-overlay hidden">
-  <div class="modal">
-    <button id="closeModal" class="close-btn">✕</button>
-    <h2 id="modalTitle"></h2>
-
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="details">Детали</button>
-      <button class="tab-btn" data-tab="comments">Комментарии</button>
+  <section id="overview" class="page active">
+    <div class="metric-grid">
+      <article class="metric"><span>Всего квартир</span><strong id="metricTotal">—</strong><small>в системе</small></article>
+      <article class="metric dark"><span>Средний прогресс</span><strong id="metricProgress">—</strong><small>по всем квартирам</small></article>
+      <article class="metric"><span>В работе</span><strong id="metricWorking">—</strong><small>активных квартир</small></article>
+      <article class="metric"><span>Завершено</span><strong id="metricDone">—</strong><small>готовых квартир</small></article>
+      <article class="metric warning"><span>Требуют внимания</span><strong id="metricRisk">—</strong><small>нет обновления более 3 дней</small></article>
     </div>
-
-    <div id="tabDetails" class="tab-content active">
-      <div class="details-grid" id="detailsContent"></div>
+    <div class="dashboard-grid">
+      <section class="panel"><div class="panel-head"><div><h2>Критические квартиры</h2><p>Просрочки, замечания и давно не обновлявшиеся объекты</p></div><button class="text-btn" data-go="apartments">Открыть список →</button></div><div id="criticalList" class="alert-list"></div></section>
+      <section class="panel"><div class="panel-head"><div><h2>Статус работ</h2><p>Распределение квартир</p></div></div><div id="statusChart" class="status-chart"></div></section>
+      <section class="panel wide"><div class="panel-head"><div><h2>Последние обновления</h2><p>Последние изменения по квартирам</p></div></div><div id="recentList" class="recent-list"></div></section>
     </div>
+  </section>
 
-    <div id="tabComments" class="tab-content">
-      <div id="commentsList" class="comments-list"></div>
-      <form id="commentForm">
-        <input type="text" id="commentAuthor" placeholder="Ваше имя" required>
-        <textarea id="commentText" placeholder="Введите комментарий..." required></textarea>
-        <button type="submit">Отправить</button>
-      </form>
-      <div id="commentStatus"></div>
-    </div>
-  </div>
-</div>
+  <section id="apartments" class="page">
+    <div class="toolbar"><input type="search" id="searchInput" placeholder="Поиск по ID, объекту или номеру квартиры"><select id="filterObjekt"><option value="">Все объекты</option></select><select id="filterStage"><option value="">Все стадии</option></select><select id="filterStatus"><option value="">Все статусы</option></select><select id="filterOtvetstv"><option value="">Все ответственные</option></select><select id="sortSelect"><option value="">Без сортировки</option><option value="percent_asc">% выполнения ↑</option><option value="percent_desc">% выполнения ↓</option><option value="date_desc">Дата обновления ↓</option><option value="date_asc">Дата обновления ↑</option><option value="id_asc">ID ↑</option></select></div>
+    <section class="panel table-panel"><div class="panel-head"><div><h2>Список квартир</h2><p id="tableCaption">Загрузка данных…</p></div></div><div class="table-wrap"><table id="apartmentsTable"><thead><tr><th>ID</th><th>Объект</th><th>№ кв.</th><th>Этаж</th><th>Стадия</th><th>Прогресс</th><th>Что осталось</th><th>Ответственный</th><th>Статус</th><th>Обновлено</th></tr></thead><tbody id="tableBody"><tr><td colspan="10" class="loading">Загрузка данных...</td></tr></tbody></table></div></section>
+  </section>
 
-<footer>
-  <p>Данные обновляются из Google Таблицы. Последнее обновление страницы: <span id="lastLoad"></span></p>
-</footer>
+  <section id="works" class="page"><div class="panel"><div class="panel-head"><div><h2>Сводка работ</h2><p>Прогресс по разделам для всех квартир</p></div></div><div id="worksNotice" class="empty-state">Загрузите в Google Таблицу лист <b>«Работы»</b>, чтобы увидеть сводку по стяжке, штукатурке, плитке и другим разделам.</div><div id="worksSummary" class="works-summary"></div></div></section>
+  <section id="history" class="page"><div class="panel"><div class="panel-head"><div><h2>История и уведомления</h2><p>Последние обновления и комментарии по объектам</p></div></div><div id="historyList" class="recent-list"></div></div></section>
+  <section id="settings" class="page"><div class="settings-grid"><section class="panel"><h2>Фильтр объектов</h2><p>Выберите объект, чтобы применить его ко всем разделам.</p><select id="globalObjectFilter"><option value="">Все объекты</option></select><button id="resetGlobalFilter" class="secondary-btn">Сбросить фильтр</button></section><section class="panel"><h2>Справочники</h2><p>Статусы, ответственные и список работ редактируются в Google Таблице. После изменения нажмите «Обновить данные».</p><a class="sheet-link" target="_blank" id="sheetLink">Открыть Google Таблицу ↗</a></section><section class="panel"><h2>Источник данных</h2><p>Сайт читает лист «Квартиры» и, при наличии, лист «Работы». Данные на сайте не редактируются — они обновляются из таблицы.</p></section></div></section>
+</main></div>
 
-<script src="script.js"></script>
-</body>
-</html>
+<div id="modalOverlay" class="modal-overlay hidden"><div class="modal"><button id="closeModal" class="close-btn">✕</button><h2 id="modalTitle"></h2><div class="tabs"><button class="tab-btn active" data-tab="details">Детали</button><button class="tab-btn" data-tab="comments">Комментарии</button></div><div id="tabDetails" class="tab-content active"><div class="details-grid" id="detailsContent"></div></div><div id="tabComments" class="tab-content"><div id="commentsList" class="comments-list"></div><form id="commentForm"><input type="text" id="commentAuthor" placeholder="Ваше имя" required><textarea id="commentText" placeholder="Введите комментарий..." required></textarea><button type="submit">Отправить</button></form><div id="commentStatus"></div></div></div></div>
+<script src="script.js"></script></body></html>
