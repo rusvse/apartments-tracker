@@ -8,134 +8,67 @@
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
-<div class="app-layout">
-  <aside class="sidebar">
-    <div class="brand">Anvaska <span>Tracker</span></div>
-    <nav class="sidebar-nav">
-      <button class="nav-link active" data-page="overview">Обзор</button>
-      <button class="nav-link" data-page="apartments">Квартиры</button>
-      <button class="nav-link" data-page="works">Работы</button>
-      <button class="nav-link" data-page="history">Уведомления / История</button>
-      <button class="nav-link" data-page="settings">Настройки</button>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="user-badge">Админ</div>
-      <div class="sidebar-note">Трекер ремонта квартир</div>
-    </div>
-  </aside>
+<header>
+  <h1>Трекер квартир — статус строительства</h1>
+  <div id="stats" class="stats"></div>
+</header>
 
-  <div class="content-area">
-    <header class="topbar">
-      <div>
-        <h1 id="pageTitle">Обзор</h1>
-        <p class="page-subtitle">Статусы квартир, прогресс и контроль этапов работ</p>
-      </div>
-      <div class="topbar-actions">
-        <input type="text" id="globalSearch" placeholder="Поиск по ID, квартире, объекту...">
-        <button id="refreshBtn">Обновить данные</button>
-      </div>
-    </header>
+<section class="controls">
+  <input type="text" id="searchInput" placeholder="Поиск по ID или номеру квартиры...">
 
-    <main class="main-content">
-      <section id="page-overview" class="page-section active">
-        <div class="metrics-grid">
-          <div class="metric-card"><div class="metric-label">Всего квартир</div><div id="metricTotal" class="metric-value">0</div></div>
-          <div class="metric-card metric-dark"><div class="metric-label">Средний % готовности</div><div id="metricAvg" class="metric-value">0%</div></div>
-          <div class="metric-card"><div class="metric-label">Завершено</div><div id="metricDone" class="metric-value">0</div></div>
-          <div class="metric-card"><div class="metric-label">Просрочки</div><div id="metricLate" class="metric-value">0</div></div>
-        </div>
+  <select id="filterObjekt"><option value="">Все объекты</option></select>
+  <select id="filterStage"><option value="">Все стадии</option></select>
+  <select id="filterStatus"><option value="">Все статусы</option></select>
+  <select id="filterOtvetstv"><option value="">Все ответственные</option></select>
 
-        <div class="dashboard-grid">
-          <section class="panel panel-wide">
-            <div class="panel-head"><h2>Критические квартиры</h2><span>Требуют внимания</span></div>
-            <div id="criticalApartments" class="stack-list empty-state">Нет критических квартир</div>
-          </section>
-          <section class="panel">
-            <div class="panel-head"><h2>Статусы</h2><span>Сводка</span></div>
-            <div id="statusSummary" class="status-summary"></div>
-          </section>
-        </div>
+  <select id="sortSelect">
+    <option value="">Без сортировки</option>
+    <option value="percent_asc">% выполнения ↑</option>
+    <option value="percent_desc">% выполнения ↓</option>
+    <option value="date_asc">Дата обновления ↑</option>
+    <option value="date_desc">Дата обновления ↓</option>
+    <option value="id_asc">ID ↑</option>
+  </select>
 
-        <div class="dashboard-grid lower-grid">
-          <section class="panel">
-            <div class="panel-head"><h2>Ближайшие дедлайны</h2><span>По дате обновления</span></div>
-            <div id="deadlinesList" class="stack-list empty-state">Дедлайнов не найдено</div>
-          </section>
-          <section class="panel panel-wide">
-            <div class="panel-head"><h2>Последние обновления</h2><span>Последние изменения в данных</span></div>
-            <div id="latestUpdates" class="updates-table empty-state">Нет обновлений</div>
-          </section>
-        </div>
-      </section>
+  <button id="refreshBtn">🔄 Обновить данные</button>
+</section>
 
-      <section id="page-apartments" class="page-section">
-        <section class="controls">
-          <input type="text" id="searchInput" placeholder="Поиск по ID или номеру квартиры...">
-          <select id="filterObjekt"><option value="">Все объекты</option></select>
-          <select id="filterStage"><option value="">Все стадии</option></select>
-          <select id="filterStatus"><option value="">Все статусы</option></select>
-          <select id="filterOtvetstv"><option value="">Все ответственные</option></select>
-          <select id="sortSelect">
-            <option value="">Без сортировки</option>
-            <option value="percent_asc">% выполнения ↑</option>
-            <option value="percent_desc">% выполнения ↓</option>
-            <option value="date_asc">Дата обновления ↑</option>
-            <option value="date_desc">Дата обновления ↓</option>
-            <option value="id_asc">ID ↑</option>
-          </select>
-        </section>
-        <div class="panel">
-          <div class="panel-head"><h2>Список квартир</h2><span id="stats"></span></div>
-          <table id="apartmentsTable">
-            <thead>
-              <tr>
-                <th>ID</th><th>Объект</th><th>№ кв.</th><th>Этаж</th><th>Стадия</th><th>Прогресс</th><th>Что осталось</th><th>Ответственный</th><th>Статус</th><th>Обновлено</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody"><tr><td colspan="10" class="loading">Загрузка данных...</td></tr></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section id="page-works" class="page-section">
-        <div class="panel">
-          <div class="panel-head"><h2>Сводка по работам</h2><span>По разделам и объёмам</span></div>
-          <div id="worksSummary" class="works-summary empty-state">Загрузка работ...</div>
-        </div>
-      </section>
-
-      <section id="page-history" class="page-section">
-        <div class="panel">
-          <div class="panel-head"><h2>История комментариев</h2><span>Последние сообщения по квартирам</span></div>
-          <div id="historyFeed" class="history-feed empty-state">История загружается...</div>
-        </div>
-      </section>
-
-      <section id="page-settings" class="page-section">
-        <div class="dashboard-grid lower-grid">
-          <section class="panel">
-            <div class="panel-head"><h2>Объекты</h2><span>Фильтр и справочник</span></div>
-            <div id="settingsObjects" class="settings-list empty-state">Нет данных</div>
-          </section>
-          <section class="panel">
-            <div class="panel-head"><h2>Ответственные</h2><span>Справочник</span></div>
-            <div id="settingsPeople" class="settings-list empty-state">Нет данных</div>
-          </section>
-        </div>
-      </section>
-    </main>
-  </div>
-</div>
+<main>
+  <table id="apartmentsTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Объект</th>
+        <th>№ кв.</th>
+        <th>Этаж</th>
+        <th>Стадия</th>
+        <th>Прогресс</th>
+        <th>Что осталось</th>
+        <th>Ответственный</th>
+        <th>Статус</th>
+        <th>Обновлено</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <tr><td colspan="10" class="loading">Загрузка данных...</td></tr>
+    </tbody>
+  </table>
+</main>
 
 <div id="modalOverlay" class="modal-overlay hidden">
   <div class="modal">
     <button id="closeModal" class="close-btn">✕</button>
     <h2 id="modalTitle"></h2>
+
     <div class="tabs">
       <button class="tab-btn active" data-tab="details">Детали</button>
       <button class="tab-btn" data-tab="comments">Комментарии</button>
     </div>
-    <div id="tabDetails" class="tab-content active"><div class="details-grid" id="detailsContent"></div></div>
+
+    <div id="tabDetails" class="tab-content active">
+      <div class="details-grid" id="detailsContent"></div>
+    </div>
+
     <div id="tabComments" class="tab-content">
       <div id="commentsList" class="comments-list"></div>
       <form id="commentForm">
@@ -147,6 +80,10 @@
     </div>
   </div>
 </div>
+
+<footer>
+  <p>Данные обновляются из Google Таблицы. Последнее обновление страницы: <span id="lastLoad"></span></p>
+</footer>
 
 <script src="script.js"></script>
 </body>
